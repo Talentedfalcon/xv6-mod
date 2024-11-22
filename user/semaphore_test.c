@@ -1,27 +1,51 @@
 #include "kernel/types.h"
 #include "user/user.h"
-// #include "kernel/semaphore.h"
+#include "kernel/spinlock.h"
+#include "kernel/param.h"
+#include "kernel/semaphore.h"
 
 struct semaphore sem;
 
-void test_semaphore() {
-    sem_init(&sem, 1); // Binary semaphore
+void test_without_semaphore(){
+    if(fork() == 0){
+        for(int i=0;i<3;i++){
+            printf("Child %d\n",i);
+        }
+        exit(0);
+    }
+    else{
+        for(int i=0;i<3;i++){
+            printf("Parent %d\n",i);
+        }
+        wait(0);
+    }
+}
 
-    if (fork() == 0) {
-        // Child process
+void test_with_semaphore(){
+    sem_init(&sem, 1);
+
+    if(fork() == 0){
         sem_wait(&sem);
-        printf("Child acquired semaphore\n");
+        for(int i=0;i<3;i++){
+            printf("Child %d\n",i);
+        }
         sem_post(&sem);
         exit(0);
-    } else {
-        // Parent process
+    }
+    else{
         sem_wait(&sem);
-        printf("Parent acquired semaphore\n");
+        for(int i=0;i<3;i++){
+            printf("Parent %d\n",i);
+        }
         sem_post(&sem);
         wait(0);
     }
 }
 
 int main(){
-    test_semaphore();
+    printf("Wihtout Semaphore:\n");
+    test_without_semaphore();
+    printf("\nWith Semaphore:\n");
+    test_with_semaphore();
+    return 0;
 }

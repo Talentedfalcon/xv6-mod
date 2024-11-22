@@ -5,6 +5,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "semaphore.h"
 
 uint64
 sys_exit(void)
@@ -90,4 +91,58 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+uint64
+sys_sem_init(void){
+  uint64 semptr;
+  int value;
+  argaddr(0,&semptr);
+  argint(1,&value);
+  
+  struct semaphore ksem;
+
+  if(copyin(myproc()->pagetable,(char*)&ksem,semptr,sizeof(ksem))<0)
+    return -1;
+
+  sem_init(&ksem,value);
+
+  if(copyout(myproc()->pagetable,semptr,(char*)&ksem,sizeof(ksem))<0)
+    return -1;
+
+  return 0;
+}
+
+uint64
+sys_sem_wait(void){
+  uint64 semptr;
+  argaddr(0,&semptr);
+
+  struct semaphore ksem;
+
+  if(copyin(myproc()->pagetable,(char*)&ksem,semptr,sizeof(ksem))<0)
+    return -1;
+
+  sem_wait(&ksem);
+
+  if(copyout(myproc()->pagetable,semptr,(char*)&ksem,sizeof(ksem))<0)
+    return -1;
+  return 0;
+}
+
+uint64
+sys_sem_post(void){
+  uint64 semptr;
+  argaddr(0,&semptr);
+
+  struct semaphore ksem;
+
+  if(copyin(myproc()->pagetable,(char*)&ksem,semptr,sizeof(ksem))<0)
+    return -1;
+
+  sem_post(&ksem);
+
+  if(copyout(myproc()->pagetable,semptr,(char*)&ksem,sizeof(ksem))<0)
+    return -1;
+  return 0;
 }

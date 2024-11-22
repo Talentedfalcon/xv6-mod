@@ -1,4 +1,6 @@
 struct stat;
+struct spinlock;
+struct semaphore;
 
 // system calls
 int fork(void);
@@ -22,6 +24,9 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+void sem_init(struct semaphore*,int);
+void sem_wait(struct semaphore*);
+void sem_post(struct semaphore*);
 
 // ulib.c
 int stat(const char*, struct stat*);
