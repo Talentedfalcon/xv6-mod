@@ -147,7 +147,7 @@ UPROGS+=\
 	$U/_clear\
 	$U/_r_testwait\
 	$U/_r_top\
-	$U/_d_signal
+	$U/_d_signal\
 	$U/_semaphore_test
 
 fs.img: mkfs/mkfs README $(UPROGS)
