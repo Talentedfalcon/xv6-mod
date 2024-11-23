@@ -36,3 +36,7 @@ entry("getpid");
 entry("sbrk");
 entry("sleep");
 entry("uptime");
+entry("shmget");
+entry("shmat");
+entry("shmdt");
+entry("shmctl");

@@ -1,4 +1,6 @@
 struct stat;
+typedef unsigned int uint;
+
 
 // system calls
 int fork(void);
@@ -41,3 +43,11 @@ void *memcpy(void *, const void *, uint);
 // umalloc.c
 void* malloc(uint);
 void free(void*);
+
+
+//shm
+
+int shmget(int key, int size, int shmflg);
+void* shmat(int shmid, const void* shmaddr, int shmflg);
+int shmdt(int shmid,const void* shmaddr);
+int shmctl(int shmid, int cmd, void* buf);
