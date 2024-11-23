@@ -48,8 +48,8 @@ It takes the following parameters:
 * `pid`: The Process ID (PID) of the child to wait for. Use -1 to wait for any child process.
 * `status`: An integer pointer child's exit status will be stored. Pass 0 if you do not need the exit status.
 * `options`: Controls the behavior of the system call:
-    1. WNOHANG (non-zero): Return immediately if no child has exited.
-    2. WBLOCK (0): Block until a child exits (default).
+    1. `WNOHANG` (non-zero): Return immediately if no child has exited.
+    2. `WBLOCK` (0): Block until a child exits (default).
 
 ## Return Value
 
