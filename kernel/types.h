@@ -8,3 +8,11 @@ typedef unsigned int  uint32;
 typedef unsigned long uint64;
 
 typedef uint64 pde_t;
+
+struct sysinfo {
+    long uptime;
+    uint64 freemem;
+    uint64 totalmem;
+    uint64 procs;
+    uint64 pids[64];
+};

@@ -103,3 +103,11 @@ sys_waitpid(void)
   argint(2, &options);
   return waitpid(pid, status, options);
 }
+
+int 
+sys_sysinfo(void)
+{
+  uint64 kinfo; //pointer to sysinfo struct in user space
+  argaddr(0, &kinfo);
+  return sysinfo(kinfo);
+}

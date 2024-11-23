@@ -29,6 +29,12 @@ struct spinlock wait_lock;
 // Allocate a page for each process's kernel stack.
 // Map it high in memory, followed by an invalid
 // guard page.
+
+//r: these are needed for sysinfo system call
+extern char end[]; // first address after kernel loaded from ELF file
+extern struct spinlock tickslock;
+extern uint ticks;
+
 void
 proc_mapstacks(pagetable_t kpgtbl)
 {
@@ -434,65 +440,6 @@ wait(uint64 addr)
   }
 }
 
-// r: waitpid system call
-// wait for the given child pid to exit and return its pid.
-// -Return -1 if this process has no children, or the child pid does not exist.
-// -Return 0 if the child pid exists but has not exited.
-// -Return the child pid if the child has exited.
-// Options:
-// --WNOHANG(nonzero): return immediately if no child has exited.
-// --WBLOCK(0): block until a child exits. (default)
-int
-waitpid(int pid, uint64 addr, int options)
-{
-  struct proc *pp;  //proc pointer
-  int foundchild, retval;
-  struct proc *p = myproc();
-
-  acquire(&wait_lock);
-  for(;;){
-    foundchild = 0;
-    for(pp = proc; pp < &proc[NPROC]; pp++){
-      if(pp->parent == p && pp->pid == pid){
-        acquire(&pp->lock);
-        //found the child pid
-        foundchild = 1;
-        if(pp->state == ZOMBIE){
-          //child exited
-          retval = pp->pid;
-          if(addr != 0 && copyout(p->pagetable, addr, (char *)&pp->xstate,
-                                  sizeof(pp->xstate)) < 0) {
-            release(&pp->lock);
-            release(&wait_lock);
-            return -1;
-          }
-          freeproc(pp);
-          release(&pp->lock);
-          release(&wait_lock);
-          return retval;
-        } else {
-          //child has not exited
-          if(options){
-            //WNOHANG
-            release(&pp->lock);
-            release(&wait_lock);
-            return 0;
-          } else {
-            //WBLOCK
-            release(&pp->lock);
-            sleep(p, &wait_lock);//this will block until a child exits
-            break;
-          }
-        }
-      }
-    }
-    if(!foundchild || killed(p)){
-      release(&wait_lock);
-      return -1;
-    }
-  }
-}
-
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
@@ -752,3 +699,114 @@ procdump(void)
     printf("\n");
   }
 }
+
+
+// r: waitpid system call
+// wait for the given child pid to exit and return its pid.
+// -Return -1 if this process has no children, or the child pid does not exist.
+// -Return 0 if the child pid exists but has not exited.
+// -Return the child pid if the child has exited.
+// Options:
+// --WNOHANG(nonzero): return immediately if no child has exited.
+// --WBLOCK(0): block until a child exits. (default)
+int
+waitpid(int pid, uint64 addr, int options)
+{
+  struct proc *pp;  //proc pointer
+  int foundchild, retval;
+  struct proc *p = myproc();
+
+  acquire(&wait_lock);
+  for(;;){
+    foundchild = 0;
+    for(pp = proc; pp < &proc[NPROC]; pp++){
+      if( (pp->parent == p && pp->pid == pid ) || (pid == -1 && pp->parent == p) ){
+        acquire(&pp->lock);
+        //found the child pid
+        foundchild = 1;
+        if(pp->state == ZOMBIE){
+          //child exited
+          retval = pp->pid;
+          if(addr != 0 && copyout(p->pagetable, addr, (char *)&pp->xstate,
+                                  sizeof(pp->xstate)) < 0) {
+            release(&pp->lock);
+            release(&wait_lock);
+            return -1;
+          }
+          freeproc(pp);
+          release(&pp->lock);
+          release(&wait_lock);
+          return retval;
+        } else {
+          //child has not exited
+          if(options){
+            //WNOHANG
+            release(&pp->lock);
+            release(&wait_lock);
+            return 0;
+          } else {
+            //WBLOCK
+            release(&pp->lock);
+            sleep(p, &wait_lock);//this will block until a child exits
+            break;
+          }
+        }
+      }
+    }
+    if(!foundchild || killed(p)){
+      release(&wait_lock);
+      return -1;
+    }
+  }
+}
+
+int 
+sysinfo(uint64 kinfo)
+{
+  //info is a pointer to a sysinfo struct in user space
+  struct sysinfo info;
+  long up_time;
+  uint64 freemem;
+  uint64 totalmem;
+  uint64 procs;
+  uint64 pids[NPROC];
+
+  //first get the uptime
+  acquire(&tickslock);
+  up_time = ticks;
+  release(&tickslock);
+
+  //get free mem
+  freemem = memfree();
+
+  //get total mem
+  totalmem = PHYSTOP - (uint64)end;
+
+  //get number of procs & ids
+  //note: pids[x] = -1 if no proc exists
+  //note: pids list can store upto 64 pids (change in types.h if needed) 
+  procs = 0;
+  struct proc *p;
+  for(p = proc; p < &proc[NPROC]; p++){
+    if(p->state != UNUSED){
+      pids[procs] = p->pid;
+      procs++;
+    }
+  }
+
+  //copy the data into sysinfo struct
+  info.uptime = up_time / 10;
+  info.freemem = freemem;
+  info.totalmem = totalmem;
+  info.procs = procs;
+  for(int i = 0; i < procs; i++){
+    info.pids[i] = pids[i];
+  }
+
+  //copy the data to user space
+  if(copyout(myproc()->pagetable, kinfo, (char*)&info, sizeof(struct sysinfo)) < 0){
+    return -1;
+  }
+  
+  return 0; //success
+} 
