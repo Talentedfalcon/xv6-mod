@@ -110,6 +110,9 @@ int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 int             sysinfo(uint64 info);
+void            handle_signals(void);
+uint64          sys_signal(void);
+void            sigint_default_handler(void);
 
 // swtch.S
 void            swtch(struct context*, struct context*);

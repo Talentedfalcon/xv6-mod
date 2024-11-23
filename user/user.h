@@ -1,4 +1,8 @@
 struct stat;
+struct sysinfo;
+
+#define SIGINT 2  // Define SIGINT signal number if not already defined
+typedef unsigned int uint;
 
 //constants for waitpid
 #define WNOHANG 1
@@ -28,6 +32,9 @@ int sleep(int);
 int uptime(void);
 int waitpid(int, int*, int);
 int sysinfo(struct sysinfo *);
+void signal(int signum, void (*handler)(int)); 
+void handle_signals(void);  // Ensure this function is implemented somewhere
+void sigint_default_handler(void);  // Default handler for SIGINT (if needed)
 
 // ulib.c
 int stat(const char*, struct stat*);

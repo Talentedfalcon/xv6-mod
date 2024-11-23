@@ -53,6 +53,10 @@ usertrap(void)
   if(r_scause() == 8){
     // system call
 
+    if(p != 0 && p->state == RUNNING){
+      handle_signals();
+    }
+
     if(killed(p))
       exit(-1);
 

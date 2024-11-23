@@ -38,3 +38,4 @@ entry("sleep");
 entry("uptime");
 entry("waitpid");
 entry("sysinfo");
+entry("signal");
