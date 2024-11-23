@@ -45,17 +45,15 @@ int waitpid(int pid, int *status, int options);
 
 The `waitpid()` system call allows a parent process to wait for a specific child process to exit. It can operate in blocking or non-blocking mode, depending on the options provided.
 It takes the following parameters:
--`pid`: The Process ID (PID) of the child to wait for. Use -1 to wait for any child process.
-
--`status`: An integer pointer child's exit status will be stored. Pass 0 if you do not need the exit status.
-
--`options`: Controls the behavior of the system call:
-WNOHANG (non-zero): Return immediately if no child has exited.
-WBLOCK (0): Block until a child exits (default).
+*`pid`: The Process ID (PID) of the child to wait for. Use -1 to wait for any child process.
+*`status`: An integer pointer child's exit status will be stored. Pass 0 if you do not need the exit status.
+*`options`: Controls the behavior of the system call:
+    1. WNOHANG (non-zero): Return immediately if no child has exited.
+    2. WBLOCK (0): Block until a child exits (default).
 
 ## Return Value
 
 `waitpid()` returns,
--`-1` if the calling process has no children, or the child does not exist, or the `copyout()` function fails.
--`0` if the specified child exists but has not yet exited (only in non-blocking mode).
--`pid` if the child has exited successfully.
++`-1` if the calling process has no children, or the child does not exist, or the `copyout()` function fails.
++`0` if the specified child exists but has not yet exited (only in non-blocking mode).
++`pid` if the child has exited successfully.
