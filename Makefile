@@ -144,7 +144,8 @@ UPROGS=\
 UPROGS+=\
 	$U/_hello\
 	$U/_clear\
-	$U/_testwait
+	$U/_r_testwait\
+	$U/_r_top
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
