@@ -39,3 +39,6 @@ entry("uptime");
 entry("waitpid");
 entry("sysinfo");
 entry("signal");
+entry("sem_init");
+entry("sem_wait");
+entry("sem_post");

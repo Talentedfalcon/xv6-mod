@@ -7,6 +7,8 @@ typedef unsigned int uint;
 //constants for waitpid
 #define WNOHANG 1
 #define WBLOCK 0
+struct spinlock;
+struct semaphore;
 
 // system calls
 int fork(void);
@@ -35,6 +37,9 @@ int sysinfo(struct sysinfo *);
 void signal(int signum, void (*handler)(int)); 
 void handle_signals(void);  // Ensure this function is implemented somewhere
 void sigint_default_handler(void);  // Default handler for SIGINT (if needed)
+void sem_init(struct semaphore*,int);
+void sem_wait(struct semaphore*);
+void sem_post(struct semaphore*);
 
 // ulib.c
 int stat(const char*, struct stat*);

@@ -23,3 +23,6 @@
 #define SYS_waitpid  22
 #define SYS_sysinfo  23
 #define SYS_signal   24
+#define SYS_sem_init 25
+#define SYS_sem_wait 26
+#define SYS_sem_post 27
