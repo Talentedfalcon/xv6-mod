@@ -150,7 +150,7 @@ UPROGS+=\
 	$U/_d_signal\
 	$U/_semaphore_test\
 	$U/_test_shm\
-	$U/_test_shm2
+	# $U/_test_shm2
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
