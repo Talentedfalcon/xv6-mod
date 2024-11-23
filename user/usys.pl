@@ -42,3 +42,7 @@ entry("signal");
 entry("sem_init");
 entry("sem_wait");
 entry("sem_post");
+entry("shmget");
+entry("shmat");
+entry("shmdt");
+entry("shmctl");

@@ -71,7 +71,11 @@ usertrap(void)
     syscall();
   } else if((which_dev = devintr()) != 0){
     // ok
-  } else {
+  } else if (r_scause() == 0xd) {
+  // Store Access Fault
+  printf("usertrap(): store access fault at address 0x%lx\n", r_stval());
+  setkilled(p);
+  }else {
     printf("usertrap(): unexpected scause 0x%lx pid=%d\n", r_scause(), p->pid);
     printf("            sepc=0x%lx stval=0x%lx\n", r_sepc(), r_stval());
     setkilled(p);

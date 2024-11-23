@@ -32,6 +32,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+
+//Custom syscalls
 int waitpid(int, int*, int);
 int sysinfo(struct sysinfo *);
 void signal(int signum, void (*handler)(int)); 
@@ -40,6 +42,10 @@ void sigint_default_handler(void);  // Default handler for SIGINT (if needed)
 void sem_init(struct semaphore*,int);
 void sem_wait(struct semaphore*);
 void sem_post(struct semaphore*);
+int shmget(int key, int size, int shmflg);
+void* shmat(int shmid, const void* shmaddr, int shmflg);
+int shmdt(int shmid,const void* shmaddr);
+int shmctl(int shmid, int cmd, void* buf);
 
 // ulib.c
 int stat(const char*, struct stat*);

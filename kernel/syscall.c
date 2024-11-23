@@ -53,11 +53,16 @@ argraw(int n)
 }
 
 // Fetch the nth 32-bit system call argument.
-void
+int
 argint(int n, int *ip)
 {
-  *ip = argraw(n);
+  int raw = argraw(n); // Fetch the raw argument
+  if (raw < 0)         // Check for invalid argument
+    return -1;
+  *ip = raw;           // Set the output parameter
+  return 0;            // Indicate success
 }
+
 
 // Retrieve an argument as a pointer.
 // Doesn't check for legality, since
@@ -107,6 +112,10 @@ extern uint64 sys_signal(void);
 extern uint64 sys_sem_init(void);
 extern uint64 sys_sem_wait(void);
 extern uint64 sys_sem_post(void);
+extern uint64 sys_shmget(void);
+extern uint64 sys_shmat(void);
+extern uint64 sys_shmdt(void);
+extern uint64 sys_shmctl(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -137,7 +146,11 @@ static uint64 (*syscalls[])(void) = {
 [SYS_signal]  sys_signal,
 [SYS_sem_init] sys_sem_init,
 [SYS_sem_wait] sys_sem_wait,
-[SYS_sem_post] sys_sem_post
+[SYS_sem_post] sys_sem_post,
+[SYS_shmget]  sys_shmget,
+[SYS_shmat]   sys_shmat,
+[SYS_shmdt]   sys_shmdt,
+[SYS_shmctl]  sys_shmctl,
 };
 
 void

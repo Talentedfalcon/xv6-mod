@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.ejs": "html",
         "proc.h": "c",
         "param.h": "c",
         "defs.h": "c",
@@ -16,5 +17,8 @@
         "tuple": "c",
         "type_traits": "c",
         "utility": "c"
+        "shm.h": "c",
+        "memlayout.h": "c",
+        "types.h": "c"
     }
 }
