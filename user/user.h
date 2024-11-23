@@ -1,5 +1,9 @@
 struct stat;
 
+//constants for waitpid
+#define WNOHANG 1
+#define WBLOCK 0
+
 // system calls
 int fork(void);
 int exit(int) __attribute__((noreturn));
@@ -22,6 +26,7 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int waitpid(int, int*, int);
 
 // ulib.c
 int stat(const char*, struct stat*);

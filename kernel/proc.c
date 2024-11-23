@@ -434,6 +434,65 @@ wait(uint64 addr)
   }
 }
 
+// r: waitpid system call
+// wait for the given child pid to exit and return its pid.
+// -Return -1 if this process has no children, or the child pid does not exist.
+// -Return 0 if the child pid exists but has not exited.
+// -Return the child pid if the child has exited.
+// Options:
+// --WNOHANG(nonzero): return immediately if no child has exited.
+// --WBLOCK(0): block until a child exits. (default)
+int
+waitpid(int pid, uint64 addr, int options)
+{
+  struct proc *pp;  //proc pointer
+  int foundchild, retval;
+  struct proc *p = myproc();
+
+  acquire(&wait_lock);
+  for(;;){
+    foundchild = 0;
+    for(pp = proc; pp < &proc[NPROC]; pp++){
+      if(pp->parent == p && pp->pid == pid){
+        acquire(&pp->lock);
+        //found the child pid
+        foundchild = 1;
+        if(pp->state == ZOMBIE){
+          //child exited
+          retval = pp->pid;
+          if(addr != 0 && copyout(p->pagetable, addr, (char *)&pp->xstate,
+                                  sizeof(pp->xstate)) < 0) {
+            release(&pp->lock);
+            release(&wait_lock);
+            return -1;
+          }
+          freeproc(pp);
+          release(&pp->lock);
+          release(&wait_lock);
+          return retval;
+        } else {
+          //child has not exited
+          if(options){
+            //WNOHANG
+            release(&pp->lock);
+            release(&wait_lock);
+            return 0;
+          } else {
+            //WBLOCK
+            release(&pp->lock);
+            sleep(p, &wait_lock);//this will block until a child exits
+            break;
+          }
+        }
+      }
+    }
+    if(!foundchild || killed(p)){
+      release(&wait_lock);
+      return -1;
+    }
+  }
+}
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:

@@ -91,3 +91,15 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int 
+sys_waitpid(void)
+{
+  int pid;
+  uint64 status;
+  int options;
+  argint(0, &pid);
+  argaddr(1, &status);
+  argint(2, &options);
+  return waitpid(pid, status, options);
+}
