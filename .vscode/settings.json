@@ -1,8 +1,13 @@
 {
     "files.associations": {
+        "*.ejs": "html",
         "proc.h": "c",
         "param.h": "c",
         "defs.h": "c",
-        "signal.h": "c"
+        "signal.h": "c",
+        "stat.h": "c",
+        "shm.h": "c",
+        "memlayout.h": "c",
+        "types.h": "c"
     }
 }

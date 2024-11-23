@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "shm.h"
 
 struct cpu cpus[NCPU];
 
@@ -692,4 +693,16 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+
+// Shared memory segments storage (global array)
+struct shmseg shm_segments[MAX_SHM_SEGMENTS];
+
+// Initialize shared memory segments array
+void shm_init(void) {
+    for (int i = 0; i < MAX_SHM_SEGMENTS; i++) {
+        shm_segments[i].key = 0;  // Uninitialized shared memory segments
+        shm_segments[i].addr = 0;
+    }
 }

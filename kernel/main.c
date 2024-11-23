@@ -5,11 +5,12 @@
 #include "defs.h"
 
 volatile static int started = 0;
-
+extern void shm_init(void);
 // start() jumps here in supervisor mode on all CPUs.
 void
 main()
 {
+  shm_init();
   if(cpuid() == 0){
     consoleinit();
     printfinit();
