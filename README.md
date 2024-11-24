@@ -96,126 +96,114 @@
     - `sem-destroy` cleans up a semaphore's resources when it is no longer needed. It resets and deallocates associated data structures.
 
     #### Return Value
-    All 3 semaphore functions return:
-    - `0`: On success.
+    All 4 semaphore functions return:
+    - `0`: On success
     - `-1`: On failure
 
-5. ### `shm` System Calls:
+5. ### `sys_shmget` System Call
 
+    `sys_shmget` - Allocate or retrieve a shared memory segment.
 
- ### `sys_shmget` System Call
+    #### Function Prototype
 
-`sys_shmget` - Allocate or retrieve a shared memory segment.
+    ```c
+    uint64 sys_shmget(void);
+    ```
 
-#### Function Prototype
+    #### Description
 
- ```c
-  uint64 sys_shmget(void);
- ```
+    The `sys_shmget` system call allocates or retrieves a shared memory segment. It takes three arguments:
+    - `key`: A unique identifier for the shared memory segment.
+    - `size`: The size of the shared memory segment.
+    - `shmflag`: Flags controlling segment behavior.
 
-#### Description
+        If a segment with the same key already exists, it increments the reference count and returns the existing segment ID. If the segment does not exist, it creates a new one, allocates memory for it, and returns the new segment ID.
 
-The `sys_shmget` system call allocates or retrieves a shared memory segment. It takes three arguments:
-- `key`: A unique identifier for the shared memory segment.
-- `size`: The size of the shared memory segment.
-- `shmflag`: Flags controlling segment behavior.
+    #### Return Value
+    On success, `sys_shmget` returns the shared memory segment ID. On failure, it returns `-1`.
 
-    If a segment with the same key already exists, it increments the reference count and returns the existing segment ID. If the segment does not exist, it creates a new one, allocates memory for it, and returns the new segment ID.
+6. ### `sys_shmat` System Call
+
+    `sys_shmat` - Attach a shared memory segment to a process's address space.
+
+    #### Function Prototype
+
+    ```c
+    uint64 sys_shmat(void);
+    ```
+
+    #### Description
+
+    The `sys_shmat` system call attaches a shared memory segment to the calling process's address space. It takes the shared memory ID (`shmid`) and the user space address (`user_addr`) where the segment should be attached.
+
+    - If the `user_addr` is not provided or is 0, the system finds a free address space for the attachment.
+    - If the `user_addr` is provided, it must be page-aligned.
+    - The function maps the shared memory segment's physical address into the process's virtual address space.
+        
+    #### Return Value
+
+    On success, `sys_shmat` returns the virtual address where the shared memory segment is mapped. On failure, it returns `-1`.
+
+7. ### `sys_shmdt` System Call
+
+    `sys_shmdt` - Detach a shared memory segment from a process's address space.
+
+    #### Function Prototype
+
+    ```c
+    uint64 sys_shmdt(void);
+    ```
+
+    #### Description
+
+    The `sys_shmdt` system call detaches a shared memory segment from the calling process's address space. It takes the shared memory ID (`shmid`) and the address to be detached (`addr`).
+
+    - The process's PID is removed from the segment's process list.
+    - The reference count for the segment is decremented.
 
     #### Return Value
 
-    On success, `sys_shmget` returns the shared memory segment ID. On failure, it returns `-1`.
+    On success, `sys_shmdt` returns `0`. On failure, it returns `-1`.
 
----
+8. ### `sys_shmctl` System Call
 
- ### `sys_shmat` System Call
+    `sys_shmctl` - Control shared memory segments.
 
-`sys_shmat` - Attach a shared memory segment to a process's address space.
+    #### Function Prototype
 
-#### Function Prototype
+    ```c
+    uint64 sys_shmctl(void);
+    ```
 
-```c
-uint64 sys_shmat(void);
-```
+    #### Description
 
-#### Description
+    The `sys_shmctl` system call performs various control operations on shared memory segments. It takes three arguments:
+    - `shmid`: The shared memory segment ID.
+    - `cmd`: The control command (e.g., remove or modify flags).
+    - `buf`: A buffer holding additional data (depending on the command).
 
-The `sys_shmat` system call attaches a shared memory segment to the calling process's address space. It takes the shared memory ID (`shmid`) and the user space address (`user_addr`) where the segment should be attached.
-
-- If the `user_addr` is not provided or is 0, the system finds a free address space for the attachment.
-- If the `user_addr` is provided, it must be page-aligned.
-- The function maps the shared memory segment's physical address into the process's virtual address space.
-    
-  #### Return Value
-
-  On success, `sys_shmat` returns the virtual address where the shared memory segment is mapped. On failure, it returns `-1`.
-
----
-
-### `sys_shmdt` System Call
-
-`sys_shmdt` - Detach a shared memory segment from a process's address space.
-
-#### Function Prototype
-
- ```c
- uint64 sys_shmdt(void);
- ```
-
-#### Description
-
-The `sys_shmdt` system call detaches a shared memory segment from the calling process's address space. It takes the shared memory ID (`shmid`) and the address to be detached (`addr`).
-
-- The process's PID is removed from the segment's process list.
-- The reference count for the segment is decremented.
-
-   #### Return Value
-
-  On success, `sys_shmdt` returns `0`. On failure, it returns `-1`.
-
----
-
-### `sys_shmctl` System Call
-
-`sys_shmctl` - Control shared memory segments.
-
- #### Function Prototype
-
-```c
-uint64 sys_shmctl(void);
-```
-
-#### Description
-
-The `sys_shmctl` system call performs various control operations on shared memory segments. It takes three arguments:
-- `shmid`: The shared memory segment ID.
-- `cmd`: The control command (e.g., remove or modify flags).
-- `buf`: A buffer holding additional data (depending on the command).
-
-  Some possible commands:
-    - `IPC_RMID`: Removes the shared memory segment.
-    - `IPC_SET`: Modifies the segment's properties.
+    Some possible commands:
+        - `IPC_RMID`: Removes the shared memory segment.
+        - `IPC_SET`: Modifies the segment's properties.
 
     #### Return Value
 
     On success, `sys_shmctl` returns `0`. On failure, it returns `-1`.
 
----
+9. ### `alloc_page` Function
 
-### `alloc_page` Function
+    `alloc_page` - Allocate a page of memory.
 
-`alloc_page` - Allocate a page of memory.
+    #### Function Prototype
 
-#### Function Prototype
+    ```c
+    void* alloc_page(void);
+    ```
 
-```c
-void* alloc_page(void);
-```
+    #### Description
 
-#### Description
+    The `alloc_page` function allocates a single page of memory using the kernel's memory allocator (`kalloc`). If the allocation fails, it returns `NULL`.
 
-The `alloc_page` function allocates a single page of memory using the kernel's memory allocator (`kalloc`). If the allocation fails, it returns `NULL`.
+    #### Return Value
 
-#### Return Value
-
-On success, `alloc_page` returns a pointer to the allocated memory page. On failure, it returns `NULL`.
+    On success, `alloc_page` returns a pointer to the allocated memory page. On failure, it returns `NULL`.
