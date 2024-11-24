@@ -39,9 +39,10 @@ int sysinfo(struct sysinfo *);
 void signal(int signum, void (*handler)(int)); 
 void handle_signals(void);  // Ensure this function is implemented somewhere
 void sigint_default_handler(void);  // Default handler for SIGINT (if needed)
-void sem_init(struct semaphore*,int);
-void sem_wait(struct semaphore*);
-void sem_post(struct semaphore*);
+int sem_init(struct semaphore*,int);
+int sem_wait(struct semaphore*);
+int sem_post(struct semaphore*);
+int sem_destroy(struct semaphore*);
 int shmget(int key, int size, int shmflg);
 void* shmat(int shmid, const void* shmaddr, int shmflg);
 int shmdt(int shmid,const void* shmaddr);

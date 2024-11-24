@@ -194,9 +194,10 @@ void            virtio_disk_rw(struct buf *, int);
 void            virtio_disk_intr(void);
 
 //semaphore.c
-void sem_init(struct semaphore*,int);
-void sem_wait(struct semaphore*);
-void sem_post(struct semaphore*);
+int sem_init(struct semaphore*,int);
+int sem_wait(struct semaphore*);
+int sem_post(struct semaphore*);
+int sem_destroy(struct semaphore*);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

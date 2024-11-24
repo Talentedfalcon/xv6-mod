@@ -26,7 +26,8 @@
 #define SYS_sem_init 25
 #define SYS_sem_wait 26
 #define SYS_sem_post 27
-#define SYS_shmget   28
-#define SYS_shmat    29
-#define SYS_shmdt    30
-#define SYS_shmctl   31
+#define SYS_sem_destroy 28
+#define SYS_shmget   29
+#define SYS_shmat    30
+#define SYS_shmdt    31
+#define SYS_shmctl   32

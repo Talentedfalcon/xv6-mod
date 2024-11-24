@@ -112,6 +112,7 @@ extern uint64 sys_signal(void);
 extern uint64 sys_sem_init(void);
 extern uint64 sys_sem_wait(void);
 extern uint64 sys_sem_post(void);
+extern uint64 sys_sem_destroy(void);
 extern uint64 sys_shmget(void);
 extern uint64 sys_shmat(void);
 extern uint64 sys_shmdt(void);
@@ -147,6 +148,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_sem_init] sys_sem_init,
 [SYS_sem_wait] sys_sem_wait,
 [SYS_sem_post] sys_sem_post,
+[SYS_sem_destroy] sys_sem_destroy,
 [SYS_shmget]  sys_shmget,
 [SYS_shmat]   sys_shmat,
 [SYS_shmdt]   sys_shmdt,

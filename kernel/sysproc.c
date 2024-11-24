@@ -185,6 +185,23 @@ sys_sem_post(void){
   return 0;
 }
 
+uint64
+sys_sem_destroy(void){
+  uint64 semptr;
+  argaddr(0,&semptr);
+
+  struct semaphore ksem;
+
+  if(copyin(myproc()->pagetable,(char*)&ksem,semptr,sizeof(ksem))<0)
+    return -1;
+
+  sem_destroy(&ksem);
+
+  if(copyout(myproc()->pagetable,semptr,(char*)&ksem,sizeof(ksem)<0))
+    return -1;
+  return 0;
+}
+
 //shm
 
 void *alloc_page(void)

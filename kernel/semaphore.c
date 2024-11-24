@@ -9,14 +9,15 @@
 
 struct semaphore all_sem;
 
-void sem_init(struct semaphore *sem, int value) {
+int sem_init(struct semaphore *sem, int value) {
   all_sem.value = value;
   initlock(&(all_sem.lock), "semaphore");
   all_sem.head = 0;
   all_sem.tail = 0;
+  return 0;
 }
 
-void sem_wait(struct semaphore *sem) {
+int sem_wait(struct semaphore *sem) {
   acquire(&all_sem.lock);
   all_sem.value--;
 
@@ -31,9 +32,10 @@ void sem_wait(struct semaphore *sem) {
   }
 
   release(&all_sem.lock);
+  return 0;
 }
 
-void sem_post(struct semaphore *sem) {
+int sem_post(struct semaphore *sem) {
   acquire(&all_sem.lock);
   all_sem.value++;
 
@@ -46,4 +48,21 @@ void sem_post(struct semaphore *sem) {
   }
 
   release(&all_sem.lock);
+  return 0;
+}
+
+int sem_destroy(struct semaphore *sem) {
+    acquire(&all_sem.lock);
+
+    if (all_sem.head!=all_sem.tail) {
+        panic("sem_destroy: destroying semaphore with waiting processes");
+    }
+
+    all_sem.value = 0;
+    for(int i=0;i<NPROC;i++){
+      all_sem.queue[i]= 0;
+    }
+
+    release(&all_sem.lock);
+    return 0;
 }

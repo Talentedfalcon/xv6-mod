@@ -47,5 +47,6 @@ int main(){
     test_without_semaphore();
     printf("\nWith Semaphore:\n");
     test_with_semaphore();
+    sem_destroy(&sem);
     return 0;
 }
